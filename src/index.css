@@ -1,0 +1,218 @@
+/* ===== CSS VARIABLES ===== */
+:root {
+  /* Colors */
+  --bg-color: #242424;
+  --text-color: #eeeeee;
+  --text-primary: rgba(255, 255, 255, 0.87);
+  --border-color: #eeeeee;
+  --accent-color: #0099ff;
+  --dark-bg: #111111;
+  --hover-bg: #222222;
+  
+  /* Player colors with high contrast */
+  --player-x-color: #ff6b7a;
+  --player-o-color: #00d2ff;
+  --player-x-glow: rgba(255, 107, 122, 0.6);
+  --player-o-glow: rgba(0, 210, 255, 0.6);
+  
+  /* Spacing */
+  --border-radius: 5px;
+  --border-radius-lg: 10px;
+  --gap-sm: 10px;
+  --gap-md: 15px;
+  --gap-lg: 20px;
+  --gap-xl: 25px;
+  
+  /* Typography */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  
+  /* System settings */
+  color-scheme: light dark;
+  color: var(--text-primary);
+  background-color: var(--bg-color);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ===== RESET & BASE STYLES ===== */
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+/* ===== MAIN BOARD ===== */
+.board {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  justify-items: center;
+  gap: var(--gap-lg);
+  width: fit-content;
+  text-align: center;
+}
+
+.board h1 {
+  background: linear-gradient(45deg, var(--player-x-color), var(--player-o-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: bold;
+  font-size: clamp(2rem, 5vw, 4rem);
+  text-shadow: 0 0 20px rgba(255, 107, 122, 0.3);
+  padding-block: .5em;
+}
+
+/* ===== BUTTONS ===== */
+.board button {
+  padding: 8px 12px;
+  margin: var(--gap-xl);
+  background: transparent;
+  border: 2px solid var(--border-color);
+  color: var(--text-color);
+  width: 100px;
+  border-radius: var(--border-radius);
+  transition: all 0.2s ease;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.board button:hover {
+  background: var(--text-color);
+  color: var(--hover-bg);
+}
+
+/* ===== GAME GRID ===== */
+.board .game {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap-sm);
+}
+
+/* ===== SQUARES ===== */
+.square {
+  width: 100px;
+  height: 100px;
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-size: 48px;
+  transition: all 0.2s ease;
+}
+
+.square:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.square.is-selected {
+  color: #fff;
+  background: var(--border-color);
+}
+
+/* ===== PLAYER COLORS ===== */
+.square {
+  color: var(--text-color);
+}
+
+/* Color para el jugador X (✖) - Rojo coral brillante */
+.square:has-text('✖') {
+  color: var(--player-x-color) !important;
+  text-shadow: 0 0 15px var(--player-x-glow);
+}
+
+/* Color para el jugador O (◯) - Cyan brillante */
+.square:has-text('◯') {
+  color: var(--player-o-color) !important;
+  text-shadow: 0 0 15px var(--player-o-glow);
+}
+
+/* Colores alternativos usando data-symbol */
+.square[data-symbol="✖"] {
+  color: var(--player-x-color) !important;
+  text-shadow: 0 0 15px var(--player-x-glow);
+  filter: brightness(1.2);
+}
+
+.square[data-symbol="◯"] {
+  color: var(--player-o-color) !important;
+  text-shadow: 0 0 15px var(--player-o-glow);
+  filter: brightness(1.2);
+}
+
+/* ===== TURN INDICATOR ===== */
+.turn {
+  display: flex;
+  justify-content: center;
+  margin: var(--gap-md) auto;
+  width: fit-content;
+  position: relative;
+  border-radius: var(--border-radius-lg);
+}
+
+.turn .square,
+.winner .square {
+  width: 70px;
+  height: 70px;
+  pointer-events: none;
+  border-color: transparent;
+}
+
+.winner {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.winner .text {
+  background: #111;
+  height: 300px;
+  width: 320px;
+  border: 2px solid #eee;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.winner .win {
+  margin: 0 auto;
+  width: fit-content;
+  border-radius: 10px;
+  display: flex;
+  gap: 15px;
+}
+
+.square {
+  width: 100px;
+  height: 100px;
+  border: 2px solid #eee;
+  border-radius: 5px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-size: 48px;
+}
