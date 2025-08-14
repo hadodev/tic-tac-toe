@@ -216,3 +216,9 @@ body {
   cursor: pointer;
   font-size: 48px;
 }
+
+.board .active {
+  background: var(--accent-color);
+  color: var(--border-color);
+  border-color: var(--accent-color);
+}

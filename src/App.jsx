@@ -1,60 +1,108 @@
-import { useState } from 'react'
-import './App.css'
-import confetti from 'canvas-confetti';
-import Board from './components/Board';
-import TurnIndicator from './components/TurnIndicator';
-import WinnerModal from './components/WinnerModal';
-import { TURNS } from './constants/turns';
-import { checkEndGame, checkWinner } from './utils/gameLogic';
+import { useState } from "react";
+import "./App.css";
+import confetti from "canvas-confetti";
+import Board from "./components/Board";
+import TurnIndicator from "./components/TurnIndicator";
+import WinnerModal from "./components/WinnerModal";
+import { TURNS, ROLES } from "./constants/turns";
+import { checkWinner } from "./utils/gameLogic";
+import GameMode from "./components/GameMode";
+import { getGroqAIMove, getOllamaAIMove } from "./services/aiLogic";
 
 function App() {
-  const [board, setBoard] = useState(Array(9).fill(null))
-  const [turn, setTurn] = useState(TURNS.X)  
-  const [winner, setWinner] = useState(null)
+  const [board, setBoard] = useState(Array(9).fill(null));
+  const [currentTurn, setCurrentTurn] = useState(TURNS.X);
+  const [winner, setWinner] = useState(null);
+  const [gameMode, setGameMode] = useState(ROLES[1]);
+
+  const updateGameMode = (mode, board) => {
+    if (board.every((cell) => cell === null)) setGameMode(mode);
+  };
 
   // Function to reset the game
   const resetGame = () => {
     setBoard(Array(9).fill(null));
-    setTurn(TURNS.X);
+    setCurrentTurn(TURNS.X);
     setWinner(null);
   };
 
-
-  const updateBoard = (index) => {
-    // Check if the square is already filled
+  const updateBoard = async (index) => {
+    console.log(`Updating board at index: ${index}`);
+    // Check if the square is already filled or game is over
     if (board[index] || winner) {
-      return; // If the square is filled or the game is over, do nothing
+      return;
     }
 
-    const newBoard = [...board]; // Create a copy of the board
+    const newBoard = [...board];
+    newBoard[index] = currentTurn;
+    setBoard(newBoard);
+    console.log(`Square ${index} clicked!`);
 
-    newBoard[index] = turn; // Update the square at the clicked index
-    setBoard(newBoard); // Update the board state
-    // Switch turns
-    const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X;
-    setTurn(newTurn); // Update the turn state
-    console.log(`Square ${index} clicked!`); // Log the clicked square index
-
-    // Check for a winner
-    const newWinner = checkWinner(newBoard);
+    // Check for winner after move
+    let newWinner = checkWinner(newBoard);
     if (newWinner) {
-      confetti(); // Trigger confetti if there's a winner
+      confetti();
       setWinner(newWinner);
-    } else if (checkEndGame(newBoard)) {
-      setWinner(false); // Set winner to false if the game ends in a draw
+      return;
     }
-  }
 
+    // Check for draw
+    if (newBoard.every((cell) => cell !== null)) {
+      setWinner(false); // Draw
+      return;
+    }
+
+    // Switch turns
+    const newTurn = currentTurn === TURNS.X ? TURNS.O : TURNS.X;
+    setCurrentTurn(newTurn);
+
+    // If it's AI mode and now it's AI's turn, make AI move
+    if (gameMode === "ai" && newTurn === TURNS.O) {
+      console.log("AI is making a move...");
+      try {
+        const aiMove = await getGroqAIMove(newBoard);
+        console.log("AI Move:", aiMove);
+
+        if (aiMove >= 0 && aiMove <= 8 && aiMove !== undefined && newBoard[aiMove] === null) {
+          const aiBoard = [...newBoard];
+          aiBoard[aiMove] = TURNS.O;
+          setBoard(aiBoard);
+          console.log(`Square ${aiMove} clicked by AI!`);
+
+          // Check for winner after AI move
+          const aiWinner = checkWinner(aiBoard);
+          if (aiWinner) {
+            confetti();
+            setWinner(aiWinner);
+            return;
+          }
+
+          // Check for draw after AI move
+          if (aiBoard.every((cell) => cell !== null)) {
+            setWinner(false);
+            return;
+          }
+
+          // Switch back to player's turn
+          setCurrentTurn(TURNS.X);
+        }
+      } catch (error) {
+        console.error("Error getting AI move:", error);
+      }
+    }
+  };
 
   return (
     <main className="board">
       <h1>Tic Tac Toe</h1>
-      <button onClick={resetGame}>Reset Game</button>
+      <GameMode mode={gameMode} updateGameMode={updateGameMode} board={board} />
+      {gameMode === "ai" && currentTurn === TURNS.O && <p>AI is thinking...</p>}
       <Board board={board} updateBoard={updateBoard} />
-      <TurnIndicator turn={turn} />
+      <TurnIndicator turn={currentTurn} />
       <WinnerModal winner={winner} resetGame={resetGame} />
+      <button onClick={resetGame}>Reset Game</button>
     </main>
-  )
+  );
 }
 
-export default App
+export default App;
