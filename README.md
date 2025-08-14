@@ -246,6 +246,4 @@ src/
 ## 👨‍💻 Autor y atribuciones
 
 Desarrollado como proyecto de aprendizaje de React inspirado en el curso de React de [midudev](https://github.com/midudev/aprendiendo-react/blob/master/projects/02-tic-tac-toe/src/App.jsx)
-
 **README.md** elaborado por **GitHub Copilot** 🤖
----
