@@ -7,7 +7,11 @@ Un juego clásico de **Tres en Raya** (Tic Tac Toe) desarrollado con React y Vit
 ![Vite](https://img.shields.io/badge/Vite-5+-646CFF?logo=vite)
 
 ## Demo live (sin el modo IA)
-![hadodev-tic-tac-toe.netlify.app](https://hadodev-tic-tac-toe.netlify.app/)
+🌐 **[Jugar ahora en línea →](https://hadodev-tic-tac-toe.netlify.app/)**
+
+## Game preview IA mode
+<img src="game-preview.jpg" alt="Game preview IA mode" width="400">
+
 
 ## ✨ Características
 
